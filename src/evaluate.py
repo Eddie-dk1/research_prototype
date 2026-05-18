@@ -46,6 +46,7 @@ def build_summary_table(
                 "recall": metrics.get("recall"),
                 "f1": metrics.get("f1", metrics.get("f1_score")),
                 "roc_auc": metrics.get("roc_auc"),
+                "pr_auc": metrics.get("pr_auc"),
             }
         )
 
@@ -57,6 +58,7 @@ def build_summary_table(
                 "recall": metrics.get("recall"),
                 "f1": metrics.get("f1", metrics.get("f1_score")),
                 "roc_auc": metrics.get("roc_auc"),
+                "pr_auc": metrics.get("pr_auc"),
             }
         )
 
@@ -128,6 +130,7 @@ def main() -> None:
 
     f1_plot_path = PLOTS_DIR / "f1_score_comparison.png"
     roc_auc_plot_path = PLOTS_DIR / "roc_auc_comparison.png"
+    pr_auc_plot_path = PLOTS_DIR / "pr_auc_comparison.png"
 
     plot_metric_bars(
         summary_frame,
@@ -143,12 +146,20 @@ def main() -> None:
         y_label="ROC-AUC",
         output_path=roc_auc_plot_path,
     )
+    plot_metric_bars(
+        summary_frame,
+        metric_column="pr_auc",
+        title="PR-AUC Comparison",
+        y_label="PR-AUC",
+        output_path=pr_auc_plot_path,
+    )
 
     print("Metrics summary:")
     print(summary_frame.to_string(index=False))
     print(f"Saved metrics summary to: {summary_path}")
     print(f"Saved F1-score comparison plot to: {f1_plot_path}")
     print(f"Saved ROC-AUC comparison plot to: {roc_auc_plot_path}")
+    print(f"Saved PR-AUC comparison plot to: {pr_auc_plot_path}")
 
 
 if __name__ == "__main__":

@@ -193,10 +193,12 @@ def run_experiment(
         "recall": float(latest["recall"]),
         "f1": float(latest["f1"]),
         "roc_auc": float(latest["roc_auc"]),
+        "pr_auc": float(latest["pr_auc"]),
         "validation_precision": float(latest["validation_precision"]),
         "validation_recall": float(latest["validation_recall"]),
         "validation_f1": float(latest["validation_f1"]),
         "validation_roc_auc": float(latest["validation_roc_auc"]),
+        "validation_pr_auc": float(latest["validation_pr_auc"]),
         "train_size": int(split_sizes["train"]),
         "validation_size": int(split_sizes["validation"]),
         "test_size": int(split_sizes["test"]),
@@ -211,6 +213,8 @@ def run_experiment(
         record["delta_recall_vs_reference"] = record["recall"] - float(reference_metrics["recall"])
         record["delta_f1_vs_reference"] = record["f1"] - float(reference_metrics["f1"])
         record["delta_roc_auc_vs_reference"] = record["roc_auc"] - float(reference_metrics["roc_auc"])
+        if reference_metrics.get("pr_auc") is not None:
+            record["delta_pr_auc_vs_reference"] = record["pr_auc"] - float(reference_metrics["pr_auc"])
 
     return record
 

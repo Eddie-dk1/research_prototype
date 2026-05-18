@@ -184,6 +184,7 @@ def build_metrics_block(
         "f1": metrics["f1_score"],
         "f1_score": metrics["f1_score"],
         "roc_auc": metrics["roc_auc"],
+        "pr_auc": metrics["pr_auc"],
         "confusion_matrix": confusion.tolist(),
     }
 
@@ -207,6 +208,7 @@ def select_best_threshold(
                 "recall": float(metrics["recall"]),
                 "f1": float(metrics["f1"]),
                 "roc_auc": float(metrics["roc_auc"]) if metrics["roc_auc"] is not None else np.nan,
+                "pr_auc": float(metrics["pr_auc"]) if metrics["pr_auc"] is not None else np.nan,
             }
         )
 
@@ -546,6 +548,7 @@ def main() -> None:
                 "validation_recall": float(epoch_validation_metrics["recall"]),
                 "validation_f1": float(epoch_validation_metrics["f1"]),
                 "validation_roc_auc": float(epoch_validation_metrics["roc_auc"]),
+                "validation_pr_auc": float(epoch_validation_metrics["pr_auc"]),
                 "validation_threshold": float(epoch_threshold),
                 "validation_threshold_percentile": int(epoch_percentile),
                 "improved": int(is_improved),
@@ -648,10 +651,16 @@ def main() -> None:
             "reference_recall": float(reference_metrics["recall"]),
             "reference_f1": float(reference_metrics["f1"]),
             "reference_roc_auc": float(reference_metrics["roc_auc"]),
+            "reference_pr_auc": float(reference_metrics["pr_auc"]) if reference_metrics.get("pr_auc") is not None else None,
             "delta_precision": float(metrics_block["precision"] - reference_metrics["precision"]),
             "delta_recall": float(metrics_block["recall"] - reference_metrics["recall"]),
             "delta_f1": float(metrics_block["f1"] - reference_metrics["f1"]),
             "delta_roc_auc": float(metrics_block["roc_auc"] - reference_metrics["roc_auc"]),
+            "delta_pr_auc": (
+                float(metrics_block["pr_auc"] - reference_metrics["pr_auc"])
+                if reference_metrics.get("pr_auc") is not None and metrics_block["pr_auc"] is not None
+                else None
+            ),
         }
 
     metadata_payload = {
@@ -738,6 +747,7 @@ def main() -> None:
                 "recall": metrics_block["recall"],
                 "f1": metrics_block["f1"],
                 "roc_auc": metrics_block["roc_auc"],
+                "pr_auc": metrics_block["pr_auc"],
                 "threshold_percentile": best_percentile,
             }
         ]
@@ -779,13 +789,20 @@ def main() -> None:
             "recall": metrics_block["recall"],
             "f1": metrics_block["f1"],
             "roc_auc": metrics_block["roc_auc"],
+            "pr_auc": metrics_block["pr_auc"],
             "validation_precision": validation_metrics["precision"],
             "validation_recall": validation_metrics["recall"],
             "validation_f1": validation_metrics["f1"],
             "validation_roc_auc": validation_metrics["roc_auc"],
+            "validation_pr_auc": validation_metrics["pr_auc"],
             "reference_recall": reference_metrics["recall"] if reference_metrics is not None else np.nan,
             "reference_f1": reference_metrics["f1"] if reference_metrics is not None else np.nan,
             "reference_roc_auc": reference_metrics["roc_auc"] if reference_metrics is not None else np.nan,
+            "reference_pr_auc": (
+                reference_metrics["pr_auc"]
+                if reference_metrics is not None and reference_metrics.get("pr_auc") is not None
+                else np.nan
+            ),
             "delta_recall": (
                 metrics_block["recall"] - reference_metrics["recall"]
                 if reference_metrics is not None
@@ -799,6 +816,11 @@ def main() -> None:
             "delta_roc_auc": (
                 metrics_block["roc_auc"] - reference_metrics["roc_auc"]
                 if reference_metrics is not None
+                else np.nan
+            ),
+            "delta_pr_auc": (
+                metrics_block["pr_auc"] - reference_metrics["pr_auc"]
+                if reference_metrics is not None and reference_metrics.get("pr_auc") is not None
                 else np.nan
             ),
         }

@@ -120,10 +120,12 @@ def main() -> None:
             "recall": float(latest["recall"]),
             "f1": float(latest["f1"]),
             "roc_auc": float(latest["roc_auc"]),
+            "pr_auc": float(latest["pr_auc"]),
             "validation_precision": float(latest["validation_precision"]),
             "validation_recall": float(latest["validation_recall"]),
             "validation_f1": float(latest["validation_f1"]),
             "validation_roc_auc": float(latest["validation_roc_auc"]),
+            "validation_pr_auc": float(latest["validation_pr_auc"]),
             "stopped_early": int(latest["stopped_early"]),
         }
         rows.append(row)

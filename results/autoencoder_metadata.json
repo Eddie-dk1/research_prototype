@@ -116,6 +116,7 @@
     "f1": 0.4901098901098901,
     "f1_score": 0.4901098901098901,
     "roc_auc": 0.7142597137224299,
+    "pr_auc": 0.7502449688932162,
     "confusion_matrix": [
       [
         1887,
@@ -132,9 +133,11 @@
     "reference_recall": 0.08828482078421938,
     "reference_f1": 0.15407220822837953,
     "reference_roc_auc": 0.5071585180570353,
+    "reference_pr_auc": null,
     "delta_precision": 0.23552516026840398,
     "delta_recall": 0.26317055568919895,
     "delta_f1": 0.341518022436478,
-    "delta_roc_auc": 0.20585751972696564
+    "delta_roc_auc": 0.20585751972696564,
+    "delta_pr_auc": null
   }
 }

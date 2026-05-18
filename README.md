@@ -126,6 +126,7 @@ python3 src/evaluate.py
 - `recall`
 - `f1`
 - `roc_auc`
+- `pr_auc`
 
 Дополнительно сохраняются матрицы ошибок и сравнительные графики по качеству моделей.
 
@@ -153,6 +154,7 @@ python3 src/evaluate.py
 - `reconstruction_error_distribution.png`
 - `f1_score_comparison.png`
 - `roc_auc_comparison.png`
+- `pr_auc_comparison.png`
 
 Для подготовки раздела «Промежуточные результаты исследования» в отчете в первую очередь рекомендуется использовать:
 

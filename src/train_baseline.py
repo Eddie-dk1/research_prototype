@@ -58,6 +58,7 @@ def build_metrics_block(
         "f1": metrics["f1_score"],
         "f1_score": metrics["f1_score"],
         "roc_auc": metrics["roc_auc"],
+        "pr_auc": metrics["pr_auc"],
         "confusion_matrix": confusion.tolist(),
     }
 
@@ -232,6 +233,7 @@ def main() -> None:
                 "recall": rf_metrics["recall"],
                 "f1": rf_metrics["f1"],
                 "roc_auc": rf_metrics["roc_auc"],
+                "pr_auc": rf_metrics["pr_auc"],
             },
             {
                 "model": "isolation_forest",
@@ -239,6 +241,7 @@ def main() -> None:
                 "recall": if_metrics["recall"],
                 "f1": if_metrics["f1"],
                 "roc_auc": if_metrics["roc_auc"],
+                "pr_auc": if_metrics["pr_auc"],
             },
         ]
     )
