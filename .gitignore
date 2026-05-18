@@ -1,0 +1,7 @@
+.DS_Store
+.matplotlib/
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+prompts.txt
+experiment.txt

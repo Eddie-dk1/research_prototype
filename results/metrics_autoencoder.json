@@ -1,0 +1,26 @@
+{
+  "lstm_autoencoder": {
+    "precision": 0.6046128500823723,
+    "recall": 0.08828482078421938,
+    "f1": 0.15407220822837953,
+    "f1_score": 0.15407220822837953,
+    "roc_auc": 0.5071585180570353,
+    "confusion_matrix": [
+      [
+        4063,
+        240
+      ],
+      [
+        3790,
+        367
+      ]
+    ],
+    "threshold": 177765.84375,
+    "threshold_percentile": 95,
+    "epochs": 5,
+    "hidden_size": 16,
+    "batch_size": 128,
+    "learning_rate": 0.001,
+    "device": "cpu"
+  }
+}

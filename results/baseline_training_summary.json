@@ -1,0 +1,19 @@
+{
+  "feature_columns": [
+    "bytes_sent",
+    "bytes_received",
+    "hour",
+    "is_weekend",
+    "user_id_encoded",
+    "source_ip_encoded",
+    "destination_ip_encoded",
+    "event_type_encoded",
+    "login_status_encoded",
+    "protocol_encoded"
+  ],
+  "train_size": 21000,
+  "test_size": 9000,
+  "anomaly_ratio_train": 0.065,
+  "random_state": 42,
+  "test_size_fraction": 0.3
+}
