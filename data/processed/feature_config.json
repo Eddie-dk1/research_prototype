@@ -11,6 +11,15 @@
     "login_status_encoded",
     "protocol_encoded"
   ],
+  "feature_columns_lstm": [
+    "bytes_sent",
+    "bytes_received",
+    "hour",
+    "is_weekend",
+    "event_type_encoded",
+    "login_status_encoded",
+    "protocol_encoded"
+  ],
   "categorical_columns": [
     "user_id",
     "source_ip",
@@ -29,14 +38,5 @@
   "test_rows": 9000,
   "train_sequences": 20100,
   "test_sequences": 8100,
-  "baseline_rows": 30000,
-  "feature_columns_lstm": [
-    "bytes_sent",
-    "bytes_received",
-    "hour",
-    "is_weekend",
-    "event_type_encoded",
-    "login_status_encoded",
-    "protocol_encoded"
-  ]
+  "baseline_rows": 30000
 }

@@ -43,7 +43,31 @@ research_prototype/
 python3 -m pip install -r requirements.txt
 ```
 
-### Последовательный запуск этапов
+### Быстрый запуск одним скриптом
+
+В корне проекта есть скрипт `run_all.sh`, который запускает весь pipeline одной командой:
+
+```bash
+bash run_all.sh
+```
+
+Полезные варианты:
+
+```bash
+bash run_all.sh --best-autoencoder
+bash run_all.sh --skip-generate --best-autoencoder
+bash run_all.sh --with-stage10
+bash run_all.sh --skip-generate --with-stage10 --stage10-epochs 50
+```
+
+Ключи:
+
+- `--skip-generate` пропускает генерацию синтетических логов, если `data/raw/synthetic_logs.csv` уже существует;
+- `--best-autoencoder` обучает лучший практический вариант LSTM-Autoencoder вместо дефолтной конфигурации;
+- `--with-stage10` запускает всю последовательность экспериментов этапа 10;
+- `--stage10-epochs 50` позволяет задать число эпох для эксперимента 6 в stage 10.
+
+### Последовательный запуск этапов вручную
 
 ```bash
 python3 src/generate_data.py
@@ -55,6 +79,23 @@ python3 src/explain_anomalies.py
 ```
 
 Если в системе настроен алиас `python`, допускается запуск тех же команд через `python`, однако для macOS в рамках данного прототипа рекомендуется использовать `python3`.
+
+### Лучшая практическая конфигурация автоэнкодера
+
+Если нужен не дефолтный, а лучший найденный практический вариант автоэнкодера, используйте:
+
+```bash
+python3 src/train_lstm_autoencoder.py \
+  --sequence-length 5 \
+  --hidden-size 32 \
+  --epochs 10 \
+  --batch-size 128 \
+  --learning-rate 0.001 \
+  --threshold-percentiles 85 90 92 95 \
+  --early-stopping-patience 0 \
+  --selection-metric f1
+python3 src/evaluate.py
+```
 
 ## 5. Какие данные используются
 
