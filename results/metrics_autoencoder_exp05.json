@@ -17,7 +17,7 @@
     ],
     "threshold": 0.8010410070419312,
     "threshold_percentile": 85,
-    "epochs": 10,
+    "epochs": 20,
     "hidden_size": 32,
     "batch_size": 128,
     "learning_rate": 0.001,

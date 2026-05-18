@@ -163,6 +163,11 @@ def parse_args() -> argparse.Namespace:
         default="",
         help="Optional label stored with experiment artifacts for grouped comparisons.",
     )
+    parser.add_argument(
+        "--artifact-suffix",
+        default="",
+        help="Optional suffix for per-experiment artifacts, for example `exp01`.",
+    )
     return parser.parse_args()
 
 
@@ -344,6 +349,21 @@ def append_experiment_record(record: dict[str, object]) -> None:
     combined.to_csv(experiments_path, index=False)
 
 
+def normalize_artifact_suffix(raw_suffix: str) -> str:
+    artifact_suffix = raw_suffix.strip()
+    if not artifact_suffix:
+        return ""
+    if "/" in artifact_suffix or "\\" in artifact_suffix:
+        raise ValueError("Artifact suffix must not contain path separators.")
+    return artifact_suffix
+
+
+def with_artifact_suffix(path: Path, artifact_suffix: str) -> Path | None:
+    if not artifact_suffix:
+        return None
+    return path.with_name(f"{path.stem}_{artifact_suffix}{path.suffix}")
+
+
 def update_feature_config_lstm_columns(lstm_feature_columns: list[str]) -> None:
     feature_config_path = PROCESSED_DIR / "feature_config.json"
     if not feature_config_path.exists():
@@ -415,6 +435,7 @@ def main() -> None:
     args = parse_args()
     ensure_directories()
     set_seed(RANDOM_STATE)
+    artifact_suffix = normalize_artifact_suffix(args.artifact_suffix)
 
     default_sequence_length, feature_columns, lstm_feature_columns = load_feature_config()
     selected_sequence_length = args.sequence_length or default_sequence_length
@@ -428,11 +449,12 @@ def main() -> None:
         raise ValueError("Epochs must be a positive integer.")
     if args.batch_size <= 0:
         raise ValueError("Batch size must be a positive integer.")
-    if args.early_stopping_patience <= 0:
-        raise ValueError("Early stopping patience must be a positive integer.")
+    if args.early_stopping_patience < 0:
+        raise ValueError("Early stopping patience must be zero or a positive integer.")
     threshold_percentiles = sorted(set(args.threshold_percentiles))
     if not threshold_percentiles:
         raise ValueError("At least one threshold percentile must be provided.")
+    early_stopping_enabled = args.early_stopping_patience > 0
 
     update_feature_config_lstm_columns(lstm_feature_columns)
     sequences, sequence_labels, sequence_stats = load_lstm_sequences(
@@ -555,7 +577,7 @@ def main() -> None:
             f"val_threshold_percentile: {epoch_percentile}"
         )
 
-        if epochs_without_improvement >= args.early_stopping_patience:
+        if early_stopping_enabled and epochs_without_improvement >= args.early_stopping_patience:
             print(
                 "Early stopping triggered: "
                 f"no validation improvement for {args.early_stopping_patience} epochs."
@@ -596,7 +618,10 @@ def main() -> None:
     }
 
     metrics_path = RESULTS_DIR / "metrics_autoencoder.json"
+    metrics_experiment_path = with_artifact_suffix(metrics_path, artifact_suffix)
     save_json(metrics_payload, metrics_path)
+    if metrics_experiment_path is not None:
+        save_json(metrics_payload, metrics_experiment_path)
 
     model_path = RESULTS_DIR / "lstm_autoencoder.pt"
     torch.save(model.state_dict(), model_path)
@@ -613,6 +638,7 @@ def main() -> None:
     outputs.to_csv(outputs_path, index=False)
 
     metadata_path = RESULTS_DIR / "autoencoder_metadata.json"
+    metadata_experiment_path = with_artifact_suffix(metadata_path, artifact_suffix)
     validation_anomaly_ratio = float(y_validation.mean()) if len(y_validation) else 0.0
     reference_metrics = load_reference_metrics()
     reference_comparison = None
@@ -628,41 +654,61 @@ def main() -> None:
             "delta_roc_auc": float(metrics_block["roc_auc"] - reference_metrics["roc_auc"]),
         }
 
-    save_json(
-        {
-            "threshold": threshold,
-            "threshold_percentile": best_percentile,
-            "threshold_percentiles_checked": threshold_percentiles,
-            "epochs": args.epochs,
-            "hidden_size": args.hidden_size,
-            "batch_size": args.batch_size,
-            "learning_rate": args.learning_rate,
-            "device": str(device),
-            "epochs_requested": args.epochs,
-            "epochs_completed": completed_epochs,
-            "best_epoch": best_epoch,
-            "early_stopping_patience": args.early_stopping_patience,
-            "selection_metric": args.selection_metric,
-            "stopped_early": bool(completed_epochs < args.epochs),
-            "train_size": int(len(X_train)),
-            "test_size": int(len(X_test)),
-            "train_inner_size": int(len(X_train_inner)),
-            "validation_size": int(len(X_validation)),
-            "train_normal_sequences": int(len(X_train_normal)),
-            "train_normal_count": int(len(X_train_normal)),
-            "validation_anomaly_ratio": validation_anomaly_ratio,
-            "sequence_length": selected_sequence_length,
-            "feature_columns": lstm_feature_columns,
-            "all_feature_columns": feature_columns,
-            "sequence_stats": sequence_stats,
-            "validation_metrics": validation_metrics,
-            "reference_comparison": reference_comparison,
+    metadata_payload = {
+        "experiment_tag": args.experiment_tag,
+        "artifact_suffix": artifact_suffix,
+        "feature_columns": lstm_feature_columns,
+        "all_feature_columns": feature_columns,
+        "feature_count": len(lstm_feature_columns),
+        "sequence_length": selected_sequence_length,
+        "hidden_size": args.hidden_size,
+        "epochs": args.epochs,
+        "batch_size": args.batch_size,
+        "learning_rate": args.learning_rate,
+        "threshold": threshold,
+        "threshold_percentile": best_percentile,
+        "threshold_percentiles_checked": threshold_percentiles,
+        "threshold_selection_method": {
+            "selection_split": "validation",
+            "candidate_type": "reconstruction_error_percentile",
+            "candidate_percentiles": threshold_percentiles,
+            "best_epoch_metric": args.selection_metric,
+            "epoch_tie_breakers": ["recall", "lower_threshold_percentile"],
         },
-        metadata_path,
-    )
+        "device": str(device),
+        "epochs_requested": args.epochs,
+        "epochs_completed": completed_epochs,
+        "best_epoch": best_epoch,
+        "early_stopping_patience": args.early_stopping_patience,
+        "early_stopping_enabled": early_stopping_enabled,
+        "selection_metric": args.selection_metric,
+        "stopped_early": bool(completed_epochs < args.epochs),
+        "split_sizes": {
+            "train": int(len(X_train_inner)),
+            "validation": int(len(X_validation)),
+            "test": int(len(X_test)),
+        },
+        "train_size": int(len(X_train)),
+        "train_inner_size": int(len(X_train_inner)),
+        "validation_size": int(len(X_validation)),
+        "test_size": int(len(X_test)),
+        "train_normal_sequences": int(len(X_train_normal)),
+        "train_normal_count": int(len(X_train_normal)),
+        "validation_anomaly_ratio": validation_anomaly_ratio,
+        "sequence_stats": sequence_stats,
+        "validation_metrics": validation_metrics,
+        "reference_comparison": reference_comparison,
+    }
+    save_json(metadata_payload, metadata_path)
+    if metadata_experiment_path is not None:
+        save_json(metadata_payload, metadata_experiment_path)
 
     history_path = RESULTS_DIR / "autoencoder_history.csv"
-    pd.DataFrame(history).to_csv(history_path, index=False)
+    history_experiment_path = with_artifact_suffix(history_path, artifact_suffix)
+    history_frame = pd.DataFrame(history)
+    history_frame.to_csv(history_path, index=False)
+    if history_experiment_path is not None:
+        history_frame.to_csv(history_experiment_path, index=False)
 
     validation_thresholds_path = RESULTS_DIR / "autoencoder_validation_thresholds.csv"
     pd.DataFrame(validation_thresholds).to_csv(validation_thresholds_path, index=False)
@@ -670,10 +716,19 @@ def main() -> None:
     distribution_path = PLOTS_DIR / "reconstruction_error_distribution.png"
     confusion_path = PLOTS_DIR / "confusion_matrix_autoencoder.png"
     roc_path = PLOTS_DIR / "roc_curve_autoencoder.png"
+    distribution_experiment_path = with_artifact_suffix(distribution_path, artifact_suffix)
+    confusion_experiment_path = with_artifact_suffix(confusion_path, artifact_suffix)
+    roc_experiment_path = with_artifact_suffix(roc_path, artifact_suffix)
 
     plot_reconstruction_distribution(y_test, test_errors, threshold, distribution_path)
     plot_confusion_matrix(y_test, test_predictions, confusion_path)
     plot_roc_curve(y_test, test_errors, roc_path)
+    if distribution_experiment_path is not None:
+        plot_reconstruction_distribution(y_test, test_errors, threshold, distribution_experiment_path)
+    if confusion_experiment_path is not None:
+        plot_confusion_matrix(y_test, test_predictions, confusion_experiment_path)
+    if roc_experiment_path is not None:
+        plot_roc_curve(y_test, test_errors, roc_experiment_path)
 
     metrics_table = pd.DataFrame(
         [
@@ -692,6 +747,7 @@ def main() -> None:
         {
             "run_label": pd.Timestamp.now(tz="UTC").isoformat(),
             "experiment_tag": args.experiment_tag,
+            "artifact_suffix": artifact_suffix,
             "sequence_length": selected_sequence_length,
             "feature_count": len(lstm_feature_columns),
             "feature_columns": "|".join(lstm_feature_columns),
@@ -708,6 +764,7 @@ def main() -> None:
             "epochs_completed": completed_epochs,
             "best_epoch": best_epoch,
             "early_stopping_patience": args.early_stopping_patience,
+            "early_stopping_enabled": int(early_stopping_enabled),
             "selection_metric": args.selection_metric,
             "stopped_early": int(completed_epochs < args.epochs),
             "train_size": int(len(X_train)),
@@ -748,10 +805,22 @@ def main() -> None:
     )
 
     print(f"Saved autoencoder metrics to: {metrics_path}")
+    if metrics_experiment_path is not None:
+        print(f"Saved experiment metrics to: {metrics_experiment_path}")
     print(f"Saved validation threshold search to: {validation_thresholds_path}")
     print(f"Saved reconstruction distribution to: {distribution_path}")
     print(f"Saved confusion matrix to: {confusion_path}")
     print(f"Saved ROC curve to: {roc_path}")
+    if metadata_experiment_path is not None:
+        print(f"Saved experiment metadata to: {metadata_experiment_path}")
+    if history_experiment_path is not None:
+        print(f"Saved experiment history to: {history_experiment_path}")
+    if distribution_experiment_path is not None:
+        print(f"Saved experiment reconstruction plot to: {distribution_experiment_path}")
+    if confusion_experiment_path is not None:
+        print(f"Saved experiment confusion matrix to: {confusion_experiment_path}")
+    if roc_experiment_path is not None:
+        print(f"Saved experiment ROC curve to: {roc_experiment_path}")
     print(
         "Validation threshold selection: "
         f"best_epoch={best_epoch}, "

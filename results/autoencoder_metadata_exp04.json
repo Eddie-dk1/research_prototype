@@ -1,6 +1,6 @@
 {
-  "experiment_tag": "stage10_practical_best",
-  "artifact_suffix": "beststage10",
+  "experiment_tag": "stage10_practical_exp04",
+  "artifact_suffix": "exp04",
   "feature_columns": [
     "bytes_sent",
     "bytes_received",

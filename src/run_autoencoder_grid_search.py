@@ -74,6 +74,7 @@ def main() -> None:
 
     for index, config in enumerate(configs, start=1):
         config_tag = f"{EXPERIMENT_TAG}_{index:02d}"
+        artifact_suffix = f"exp{index:02d}"
         print(
             f"[{index}/{len(configs)}] "
             f"seq={config['sequence_length']} "
@@ -104,6 +105,8 @@ def main() -> None:
                 SELECTION_METRIC,
                 "--experiment-tag",
                 config_tag,
+                "--artifact-suffix",
+                artifact_suffix,
             ]
         )
         latest = load_latest_experiment(config_tag)
@@ -158,6 +161,8 @@ def main() -> None:
             SELECTION_METRIC,
             "--experiment-tag",
             f"{EXPERIMENT_TAG}_best",
+            "--artifact-suffix",
+            f"exp{len(configs) + 1:02d}",
         ]
     )
     run_command([sys.executable, str(EVALUATE_SCRIPT)])

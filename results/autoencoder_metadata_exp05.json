@@ -1,6 +1,6 @@
 {
-  "experiment_tag": "stage10_practical_best",
-  "artifact_suffix": "beststage10",
+  "experiment_tag": "stage10_practical_exp05",
+  "artifact_suffix": "exp05",
   "feature_columns": [
     "bytes_sent",
     "bytes_received",
@@ -25,7 +25,7 @@
   "feature_count": 7,
   "sequence_length": 5,
   "hidden_size": 32,
-  "epochs": 10,
+  "epochs": 20,
   "batch_size": 128,
   "learning_rate": 0.001,
   "threshold": 0.8010410070419312,
@@ -52,13 +52,13 @@
     ]
   },
   "device": "cpu",
-  "epochs_requested": 10,
-  "epochs_completed": 10,
+  "epochs_requested": 20,
+  "epochs_completed": 14,
   "best_epoch": 9,
-  "early_stopping_patience": 0,
-  "early_stopping_enabled": false,
+  "early_stopping_patience": 5,
+  "early_stopping_enabled": true,
   "selection_metric": "f1",
-  "stopped_early": false,
+  "stopped_early": true,
   "split_sizes": {
     "train": 16352,
     "validation": 4088,
