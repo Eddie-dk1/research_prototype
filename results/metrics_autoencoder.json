@@ -1,26 +1,45 @@
 {
   "lstm_autoencoder": {
-    "precision": 0.6046128500823723,
-    "recall": 0.08828482078421938,
-    "f1": 0.15407220822837953,
-    "f1_score": 0.15407220822837953,
-    "roc_auc": 0.5071585180570353,
+    "precision": 0.873545384018619,
+    "recall": 0.4496805111821086,
+    "f1": 0.5937252834168204,
+    "f1_score": 0.5937252834168204,
+    "roc_auc": 0.8186911172303344,
     "confusion_matrix": [
       [
-        4063,
-        240
+        6093,
+        163
       ],
       [
-        3790,
-        367
+        1378,
+        1126
       ]
     ],
-    "threshold": 177765.84375,
-    "threshold_percentile": 95,
-    "epochs": 5,
+    "threshold": 0.5106677412986755,
+    "threshold_percentile": 85,
+    "epochs": 30,
     "hidden_size": 16,
-    "batch_size": 128,
+    "batch_size": 64,
     "learning_rate": 0.001,
-    "device": "cpu"
+    "device": "cpu",
+    "validation_metrics": {
+      "precision": 0.8566775244299675,
+      "recall": 0.4503424657534247,
+      "f1": 0.590347923681257,
+      "f1_score": 0.590347923681257,
+      "roc_auc": 0.8249894445486958,
+      "confusion_matrix": [
+        [
+          2832,
+          88
+        ],
+        [
+          642,
+          526
+        ]
+      ]
+    },
+    "best_epoch": 25,
+    "selection_metric": "f1"
   }
 }

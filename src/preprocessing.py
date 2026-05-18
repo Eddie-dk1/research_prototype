@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 
 from features import CATEGORICAL_COLUMNS
+from features import LSTM_FEATURE_COLUMNS
 from features import NUMERIC_COLUMNS
 from features import build_feature_table
 from features import build_sequences
@@ -114,6 +115,7 @@ def main() -> None:
     save_json(
         {
             "feature_columns": feature_columns,
+            "feature_columns_lstm": LSTM_FEATURE_COLUMNS,
             "categorical_columns": CATEGORICAL_COLUMNS,
             "numeric_columns": NUMERIC_COLUMNS,
             "sequence_length": SEQUENCE_LENGTH,

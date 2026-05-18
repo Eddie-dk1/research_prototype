@@ -1,0 +1,12 @@
+[
+  "bytes_sent",
+  "bytes_received",
+  "hour",
+  "is_weekend",
+  "user_id_encoded",
+  "source_ip_encoded",
+  "destination_ip_encoded",
+  "event_type_encoded",
+  "login_status_encoded",
+  "protocol_encoded"
+]

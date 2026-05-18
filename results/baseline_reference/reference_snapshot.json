@@ -1,0 +1,34 @@
+{
+  "baseline_metrics": {
+    "random_forest": {
+      "f1": 0.9957228400342173,
+      "roc_auc": 0.9999937027388008
+    },
+    "isolation_forest": {
+      "f1": 0.5717932354818124,
+      "roc_auc": 0.9471151941740177
+    }
+  },
+  "lstm_autoencoder_reference": {
+    "precision": 0.6046128500823723,
+    "recall": 0.08828482078421938,
+    "f1": 0.15407220822837953,
+    "roc_auc": 0.5071585180570353,
+    "sequence_length": 10,
+    "hidden_size": 16,
+    "epochs": 5,
+    "threshold_percentile": 95,
+    "feature_columns": [
+      "bytes_sent",
+      "bytes_received",
+      "hour",
+      "is_weekend",
+      "user_id_encoded",
+      "source_ip_encoded",
+      "destination_ip_encoded",
+      "event_type_encoded",
+      "login_status_encoded",
+      "protocol_encoded"
+    ]
+  }
+}

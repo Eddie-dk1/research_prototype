@@ -1,0 +1,12 @@
+{
+  "threshold": 177765.84375,
+  "threshold_percentile": 95,
+  "epochs": 5,
+  "hidden_size": 16,
+  "batch_size": 128,
+  "learning_rate": 0.001,
+  "device": "cpu",
+  "train_size": 19740,
+  "test_size": 8460,
+  "train_normal_sequences": 10042
+}

@@ -24,6 +24,16 @@ PASSTHROUGH_COLUMNS = [
     "is_weekend",
 ]
 
+LSTM_FEATURE_COLUMNS = [
+    "bytes_sent",
+    "bytes_received",
+    "hour",
+    "is_weekend",
+    "event_type_encoded",
+    "login_status_encoded",
+    "protocol_encoded",
+]
+
 
 def sort_events(data_frame: pd.DataFrame) -> pd.DataFrame:
     frame = data_frame.copy()
