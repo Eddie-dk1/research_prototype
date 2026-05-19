@@ -43,6 +43,12 @@ research_prototype/
 python3 -m pip install -r requirements.txt
 ```
 
+Для улучшенного terminal dashboard в финальном отчете `run_all.sh` можно дополнительно установить `rich`:
+
+```bash
+python3 -m pip install rich
+```
+
 ### Быстрый запуск одним скриптом
 
 В корне проекта есть скрипт `run_all.sh`, который запускает весь pipeline одной командой:
@@ -66,6 +72,8 @@ bash run_all.sh --skip-generate --with-stage10 --stage10-epochs 50
 - `--best-autoencoder` обучает лучший практический вариант LSTM-Autoencoder вместо дефолтной конфигурации;
 - `--with-stage10` запускает всю последовательность экспериментов этапа 10;
 - `--stage10-epochs 50` позволяет задать число эпох для эксперимента 6 в stage 10.
+
+После завершения pipeline скрипт печатает итоговый отчет прямо в терминал. По умолчанию отчет работает в текстовом режиме на базе `pandas`, а при наличии `rich` отображается как более наглядный mini-dashboard с таблицами метрик, лучшей моделью, деталями LSTM-Autoencoder, примерами аномалий и списком сгенерированных файлов.
 
 ### Последовательный запуск этапов вручную
 
@@ -137,6 +145,7 @@ python3 src/evaluate.py
 - `results/metrics_baseline.json`
 - `results/metrics_autoencoder.json`
 - `results/metrics_summary.csv`
+- `results/autoencoder_validation_thresholds.csv`
 - `results/anomaly_examples.csv`
 - `results/baseline_outputs.csv`
 - `results/autoencoder_outputs.csv`
@@ -161,6 +170,7 @@ python3 src/evaluate.py
 - `results/metrics_summary.csv`
 - `results/metrics_baseline.json`
 - `results/metrics_autoencoder.json`
+- `results/autoencoder_validation_thresholds.csv`
 - `results/anomaly_examples.csv`
 - графики из `results/plots/`
 
